@@ -13,7 +13,7 @@ def hello_world():
     value=45.67,
     timestamp = str(time.time())
     )
-    return f"{batch.value}ЫЫЫЫ"
+    return f"{batch.value}asdЫЫЫ-777"
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
