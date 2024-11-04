@@ -1,1 +1,0 @@
-# iot_data_simulator/__init__.py
