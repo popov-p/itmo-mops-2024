@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "datasim"
+version = "0.1.0"
+description = "Data simulator."
+dependencies = [
+  "protobuf>=5.28.3",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/datasim", "src/tools"]
+
+[tool.hatch.envs]
+envs = { no_pyc = "PYTHONPYCACHEPREFIX=" }
+
+
+[project.scripts]
+datasim = "datasim.main:main"
+
+
+
+

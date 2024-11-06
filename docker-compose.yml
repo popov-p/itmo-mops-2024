@@ -11,7 +11,7 @@ services:
       - FREQUENCY=777
     develop:
       watch:
-        - action: sync
+        - action: sync+restart
           path: ./iot_data_simulator
           target: itmo-mops-2024/iot_data_simulator
 

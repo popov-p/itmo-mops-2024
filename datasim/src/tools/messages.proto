@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ds;
+package dm;
 
 message Batch {
     int32 device_id = 1;
