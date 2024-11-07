@@ -15,4 +15,4 @@ packages = [{include = "controller", from = "src"},
 python = "^3.12"
 protobuf = "^5.28.3"
 flask = "^3.0.0"
-Werkzeug = "^3.1.1"
+

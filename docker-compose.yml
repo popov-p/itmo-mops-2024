@@ -5,9 +5,6 @@ services:
     restart: on-failure
     ports:
       - "8081:80"
-    #environment:
-    #  - CLIENT_COUNT=666
-    #  - FREQUENCY=777
     develop:
       watch:
         - action: sync+restart
