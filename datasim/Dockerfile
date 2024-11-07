@@ -1,13 +1,30 @@
-FROM python:3.12-alpine
-WORKDIR /itmo-mops-2024
+FROM python:3.12-alpine AS python-base
 
-COPY ./iot_proto_message ./iot_proto_message
-COPY ./iot_data_simulator/data_simulator.py ./iot_data_simulator/
-COPY ./iot_data_simulator/main.py ./iot_data_simulator/
+ENV POETRY_VERSION=1.8.4
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VENV=/opt/poetry-venv
+ENV POETRY_CACHE_DIR=/opt/.cache
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY ./iot_data_simulator/requirements.txt ./iot_data_simulator/
-RUN pip install --no-cache-dir -r ./iot_data_simulator/requirements.txt
 
-EXPOSE 5000
+FROM python-base AS poetry-base
 
-CMD ["python", "-u", "-B", "-m", "iot_data_simulator.main"]
+RUN python3 -m venv $POETRY_VENV \
+    && $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
+
+FROM python-base
+
+COPY --from=poetry-base ${POETRY_VENV} ${POETRY_VENV}
+
+ENV PATH="${PATH}:${POETRY_VENV}/bin"
+
+WORKDIR /app
+
+COPY poetry.lock pyproject.toml README.md ./
+COPY src/ /app/src/
+
+RUN poetry check
+RUN poetry install
+
+CMD ["poetry", "run", "datasim"]

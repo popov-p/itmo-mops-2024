@@ -2,6 +2,15 @@ from proto import messages_pb2
 import asyncio
 import random
 
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Логирование
+logging.info("Это информационное сообщение.")
+#logging.error("Это сообщение об ошибке.")
+
 class DataSimulator:
     def __init__(self, num_devices: int, frequency: float):
         self.num_devices = num_devices
@@ -9,6 +18,7 @@ class DataSimulator:
 
     async def generate_message(self, device_id: int):
         while True:
+            logging.info("Это информационное сообщение.")
             message = f"{device_id} привет"
             print(message)
             await asyncio.sleep(1 / self.frequency)
