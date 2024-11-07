@@ -15,4 +15,5 @@ python -B -m iot_controller.main
 docker build -t iot_data_simulator -f iot_data_simulator/Dockerfile .
 docker build -t iot_controller -f iot_controller/Dockerfile .
 docker run -d --entrypoint /bin/sh pyds:latest -c "while true; do sleep 1000; done"
+docker run -it --entrypoint /bin/sh pcont
 ```

@@ -3,21 +3,16 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "datasim"
+name = "IOT controller"
 version = "0.1.0"
-description = "Data Simulator."
+description = "Incoming message manager."
 authors = ["Pavel Popov <pashafizmat1@gmail.com>"]
 readme = "README.md"
-packages = [{include = "datasim", from = "src"},
+packages = [{include = "controller", from = "src"},
             {include = "proto", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
 protobuf = "^5.28.3"
-requests = "^2.32.3"
-
-[tool.poetry.scripts]
-datasim = 'datasim.main:main'
-compile_protobuf = "proto.compile:compile_protobuf"
-
-
+flask = "^3.0.0"
+Werkzeug = "^3.1.1"

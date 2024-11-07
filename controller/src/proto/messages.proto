@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package dm;
+
+message Batch {
+    int32 device_id = 1;
+    float value = 2;
+    string timestamp = 3;
+}

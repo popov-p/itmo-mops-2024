@@ -19,6 +19,8 @@ class DataSimulator:
                 message = f"Device {device_id} sending message."
                 logging.info(message)
                 await asyncio.sleep(1 / self.frequency)
+        except Exception as ex:
+            logging.error(f"An error occurred in task for device {device_id}: {ex}")
         finally:
             logging.info(f"Task stopped for device {device_id}.")
 
