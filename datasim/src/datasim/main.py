@@ -1,5 +1,5 @@
-from .core import DataSimulator
-from tools import messages
+from datasim.core import DataSimulator
+from proto import messages
 import time
 import os
 

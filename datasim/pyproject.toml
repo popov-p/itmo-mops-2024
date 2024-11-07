@@ -1,25 +1,22 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "datasim"
 version = "0.1.0"
-description = "Data simulator."
-dependencies = [
-  "protobuf>=5.28.3",
-]
+description = ""
+authors = ["Pavel Popov <pashafizmat1@gmail.com>"]
+readme = "README.md"
+packages = [{include = "datasim", from = "src"},
+            {include = "proto", from = "src"}]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/datasim", "src/tools"]
+[tool.poetry.dependencies]
+python = "^3.12"
+protobuf = "^5.28.3"
 
-[tool.hatch.envs]
-envs = { no_pyc = "PYTHONPYCACHEPREFIX=" }
-
-
-[project.scripts]
-datasim = "datasim.main:main"
-
-
+[tool.poetry.scripts]
+datasim = 'datasim.main:main'
+compile_protobuf = "proto.compile:compile_protobuf"
 
 
