@@ -1,7 +1,6 @@
 FROM python:3.12-alpine AS python-base
 
 ENV POETRY_VERSION=1.8.4
-ENV POETRY_HOME=/opt/poetry
 ENV POETRY_VENV=/opt/poetry-venv
 ENV POETRY_CACHE_DIR=/opt/.cache
 ENV PYTHONUNBUFFERED=1
@@ -19,10 +18,10 @@ COPY --from=poetry-base ${POETRY_VENV} ${POETRY_VENV}
 
 ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
-WORKDIR /app
+WORKDIR /datasim
 
 COPY poetry.lock pyproject.toml README.md ./
-COPY src/ /app/src/
+COPY src/ /datasim/src/
 
 RUN poetry check
 RUN poetry install
