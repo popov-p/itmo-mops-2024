@@ -9,7 +9,7 @@ app = Flask(__name__)
 def hello_world():
     batch = Batch(
     device_id=123,
-    value=45.67,
+    value=12.67,
     timestamp = str(time.time())
     )
     return f"{batch.value}asdЫЫЫ-777"

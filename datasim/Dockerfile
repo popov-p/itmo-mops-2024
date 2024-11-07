@@ -19,6 +19,8 @@ ENV PATH="${PATH}:${POETRY_VENV}/bin"
 WORKDIR /datasim
 COPY poetry.lock pyproject.toml README.md ./
 COPY src/ /datasim/src/
-RUN poetry lock --no-update && poetry check && poetry install
+RUN poetry lock --no-update && \
+    poetry check && poetry install && \
+    poetry cache clear --all --no-interaction .
 
 CMD ["poetry", "run", "datasim"]

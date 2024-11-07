@@ -18,7 +18,9 @@ ENV PATH="${PATH}:${POETRY_VENV}/bin"
 WORKDIR /controller
 COPY poetry.lock pyproject.toml README.md entrypoint.sh ./
 COPY src/ ./src/
-RUN poetry lock --no-update && poetry check && poetry install
+RUN poetry lock --no-update && \
+    poetry check && poetry install && \
+    poetry cache clear --all --no-interaction .
 EXPOSE 5000
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
