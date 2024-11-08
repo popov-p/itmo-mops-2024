@@ -15,6 +15,7 @@ packages = [{include = "datasim", from = "src"},
 python = "^3.12"
 protobuf = "^5.28.3"
 requests = "^2.32.3"
+aiohttp = "^3.10.10"
 
 [tool.poetry.scripts]
 datasim = 'datasim.main:main'

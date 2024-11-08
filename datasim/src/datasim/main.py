@@ -1,10 +1,15 @@
-from proto import messages_pb2
+from src.proto.messages_pb2 import Batch
 import asyncio
+import aiohttp
 import random
 import signal
+import requests
 import logging
+import time
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
+
+url = "http://itmo-mops-2024-controller_service-1:5000/incoming-data"
 
 class DataSimulator:
     def __init__(self, num_devices: int, frequency: float):
@@ -15,10 +20,19 @@ class DataSimulator:
 
     async def generate_message(self, device_id: int):
         try:
-            while not self.stop_event.is_set():
-                message = f"Device {device_id} sending message."
-                logging.info(message)
-                await asyncio.sleep(1 / self.frequency)
+            async with aiohttp.ClientSession() as session:
+                while not self.stop_event.is_set():
+                    batch = Batch(device_id=device_id, value=random.randint(1, 100),
+                                    timestamp=str(time.time()))
+                    logging.info(f"Отправляем данные. ID: {batch.device_id}, value: {batch.value}, timestamp: {batch.timestamp}")
+                    async with session.post(url, data=batch.SerializeToString()) as response:
+                        if response.status == 200:
+                            logging.info(f"Ответ от IOT контроллера: {await response.text()}")
+                        else:
+                            error_text = await response.text()
+                            logging.error(f"Ошибка при отправке. Статус: {response.status}, тело ошибки: {error_text}.")
+
+                    await asyncio.sleep(1 / self.frequency) 
         except Exception as ex:
             logging.error(f"An error occurred in task for device {device_id}: {ex}")
         finally:
@@ -35,8 +49,8 @@ class DataSimulator:
 
 
 def main():
-    num_devices = 5
-    frequency = 1
+    num_devices = 1
+    frequency = 0.2
     generator = DataSimulator(num_devices, frequency)
 
     loop = asyncio.get_event_loop()
