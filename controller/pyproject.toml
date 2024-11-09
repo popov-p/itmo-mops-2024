@@ -14,5 +14,5 @@ packages = [{include = "controller", from = "src"},
 [tool.poetry.dependencies]
 python = "^3.12"
 protobuf = "^5.28.3"
-flask = "^3.0.0"
-
+Flask = "^3.0.0"
+Flask-PyMongo = "^2.3.0"

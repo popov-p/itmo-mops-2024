@@ -5,6 +5,8 @@ services:
     restart: on-failure
     ports:
       - "5000:5000"
+    volumes:
+      - controller_src:/controller/src
     develop:
       watch:
         - action: sync+restart
@@ -14,11 +16,27 @@ services:
   datasim_service:
     build:
       context: ./datasim
-    restart: on-failure
+    restart: always
     ports:
       - "8081:80"
+    volumes:
+      - datasim_src:/datasim/src
     develop:
       watch:
         - action: sync+restart
           path: .
           target: .
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: pavel
+      MONGO_INITDB_ROOT_PASSWORD: popov
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+volumes:
+  mongo_data:
+  controller_src:
+  datasim_src:
