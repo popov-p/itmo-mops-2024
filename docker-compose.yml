@@ -1,5 +1,5 @@
 services:
-  controller_service:
+  controller:
     build:
       context: ./controller
     restart: on-failure
@@ -13,12 +13,10 @@ services:
           path: .
           target: .
 
-  datasim_service:
+  datasim:
     build:
       context: ./datasim
     restart: always
-    ports:
-      - "8081:80"
     volumes:
       - datasim_src:/datasim/src
     develop:
@@ -26,6 +24,7 @@ services:
         - action: sync+restart
           path: .
           target: .
+
   mongo:
     image: mongo
     restart: always
@@ -36,7 +35,20 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: pavel
+      RABBITMQ_DEFAULT_PASS: popov
+
 volumes:
   mongo_data:
+  rabbitmq_data:
   controller_src:
   datasim_src:
