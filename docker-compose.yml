@@ -1,4 +1,29 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: pavel
+      RABBITMQ_DEFAULT_PASS: popov
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: pavel
+      MONGO_INITDB_ROOT_PASSWORD: popov
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    depends_on:
+      - rabbitmq
+
   controller:
     build:
       context: ./controller
@@ -12,6 +37,22 @@ services:
         - action: sync+restart
           path: .
           target: .
+    depends_on:
+      - mongo
+
+  rule_engine:
+    build:
+      context: ./rule_engine
+    restart: on-failure
+    volumes:
+      - rule_engine_src:/rule_engine/src
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: .
+    depends_on:
+      - controller
 
   datasim:
     build:
@@ -24,31 +65,12 @@ services:
         - action: sync+restart
           path: .
           target: .
-
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: pavel
-      MONGO_INITDB_ROOT_PASSWORD: popov
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: pavel
-      RABBITMQ_DEFAULT_PASS: popov
-
+    depends_on:
+      - rule_engine
+  
 volumes:
   mongo_data:
   rabbitmq_data:
   controller_src:
   datasim_src:
+  rule_engine_src:

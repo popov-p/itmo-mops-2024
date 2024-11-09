@@ -1,5 +1,5 @@
 from .rabbitmq import connect_to_rabbitmq
-from ..proto import messages_pb2
+from ..proto.messages_pb2 import Batch
 from flask import Flask,  Response, request
 from flask_pymongo import PyMongo
 app = Flask(__name__)
@@ -13,20 +13,21 @@ rabbitmq_channel = connect_to_rabbitmq()
 @app.route("/incoming-data", methods=["POST"])
 def incoming_data():
     try:
-        batch = messages_pb2.Batch()
+        batch = Batch()
         batch.ParseFromString(request.data)
-        if batch.value < 30:
-            return Response( "Не принято. Ожидается value >= 30", status=501)
+        if batch.alpha < 25:
+            return Response( "Не принято! Ожидается alpha >= 25", status=501)
 
         rabbitmq_channel.basic_publish(
             exchange='',
-            routing_key='filtered_queue',
-            body=str(request.data)
+            routing_key='validated_queue',
+            body=request.data
         )
 
         data = {
             "device_id": batch.device_id,
-            "value": batch.value,
+            "alpha": batch.alpha,
+            "beta": batch.beta,
             "timestamp": batch.timestamp
         }
 

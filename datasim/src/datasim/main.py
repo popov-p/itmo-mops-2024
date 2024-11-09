@@ -1,4 +1,4 @@
-from src.proto.messages_pb2 import Batch
+from proto.messages_pb2 import Batch
 import asyncio
 import aiohttp
 import random
@@ -18,13 +18,16 @@ class DataSimulator:
         self.tasks = []
         self.stop_event = asyncio.Event()
 
-    async def generate_message(self, device_id: int):
+    async def generate_message(self, device_id:int):
         try:
             async with aiohttp.ClientSession() as session:
                 while not self.stop_event.is_set():
-                    batch = Batch(device_id=device_id, value=random.randint(1, 100),
-                                    timestamp=str(time.time()))
-                    logging.info(f"Отправляем данные. ID: {batch.device_id}, value: {batch.value}, timestamp: {batch.timestamp}")
+                    batch = Batch(device_id=device_id,
+                                  alpha=random.randint(1, 100),
+                                  beta=random.randint(1, 100),
+                                  timestamp=str(time.time()))
+                    logging.info(f"Отправляем данные. ID: {batch.device_id}, "
+                                 f"alpha: {batch.alpha}, beta: {batch.beta}, timestamp: {batch.timestamp}")
                     async with session.post(url, data=batch.SerializeToString()) as response:
                         if response.status == 200:
                             logging.info(f"Ответ от IOT контроллера: {await response.text()}")
@@ -49,8 +52,8 @@ class DataSimulator:
 
 
 def main():
-    num_devices = 1
-    frequency = 0.2
+    num_devices = 2
+    frequency = 0.5
     generator = DataSimulator(num_devices, frequency)
 
     loop = asyncio.get_event_loop()

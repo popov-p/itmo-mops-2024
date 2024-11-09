@@ -4,6 +4,7 @@ package dm;
 
 message Batch {
     int32 device_id = 1;
-    float value = 2;
-    string timestamp = 3;
+    float alpha = 2;
+    float beta = 3;
+    string timestamp = 4;
 }
