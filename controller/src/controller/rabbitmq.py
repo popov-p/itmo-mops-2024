@@ -1,9 +1,18 @@
 import pika
 
-def connect_to_rabbitmq():
+device_channels = {}
+
+def create_connection():
+    credentials = pika.PlainCredentials('pavel', 'popov')
+    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/', credentials)
+    connection = pika.BlockingConnection(parameters)
+    return connection
+
+def create_channel_for_device(device_id):
     credentials = pika.PlainCredentials('pavel', 'popov')
     parameters = pika.ConnectionParameters('rabbitmq', 5672, '/', credentials)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     channel.queue_declare(queue='validated_queue', durable=True)
+    device_channels[device_id] = channel
     return channel

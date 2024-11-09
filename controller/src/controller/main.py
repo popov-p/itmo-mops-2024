@@ -1,14 +1,16 @@
-from .rabbitmq import connect_to_rabbitmq
+from .rabbitmq import (device_channels,
+                       create_connection, create_channel_for_device)
 from ..proto.messages_pb2 import Batch
 from flask import Flask,  Response, request
 from flask_pymongo import PyMongo
+
+connection = create_connection()
 app = Flask(__name__)
 
 app.config["MONGO_URI"] = "mongodb://pavel:popov@mongo:27017/iotdata?authSource=admin"
 
 mongo = PyMongo(app)
 
-rabbitmq_channel = connect_to_rabbitmq()
 
 @app.route("/incoming-data", methods=["POST"])
 def incoming_data():
@@ -17,6 +19,14 @@ def incoming_data():
         batch.ParseFromString(request.data)
         if batch.alpha < 25:
             return Response( "Не принято! Ожидается alpha >= 25", status=501)
+
+
+        if batch.device_id not in device_channels:
+            print("Канала нет, создаем новый.")
+            rabbitmq_channel = create_channel_for_device(batch.device_id)
+        else:
+            print("Используем существующий канал.")
+            rabbitmq_channel = device_channels[batch.device_id]
 
         rabbitmq_channel.basic_publish(
             exchange='',

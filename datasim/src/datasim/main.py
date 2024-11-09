@@ -52,7 +52,7 @@ class DataSimulator:
 
 
 def main():
-    num_devices = 2
+    num_devices = 15
     frequency = 0.5
     generator = DataSimulator(num_devices, frequency)
 
