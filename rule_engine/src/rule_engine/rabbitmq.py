@@ -2,6 +2,7 @@ from proto.messages_pb2 import Batch
 import time
 import aiormq, asyncio
 from .database import instant, ongoing, db
+from .prometheus import  INSTANT_RULES_COUNTER, ONGOING_RULES_COUNTER
 
 async def connect_to_rabbitmq():
     while True:
@@ -14,7 +15,6 @@ async def connect_to_rabbitmq():
         except aiormq.AMQPConnectionError as e:
             print(f"Ошибка при подключении: {e}. Попробуем снова через 1 секунду.")
             await asyncio.sleep(2)
-
 
 
 async def on_message(message: aiormq.abc.DeliveredMessage):
@@ -31,6 +31,7 @@ async def on_message(message: aiormq.abc.DeliveredMessage):
 
         if batch.alpha <= 50:
             print(f"Сработало instant rule для ID: {batch.device_id}, alpha: {batch.alpha}")
+            INSTANT_RULES_COUNTER.inc()
             await instant.insert_one({
                 "device_id": batch.device_id,
                 "alpha": batch.alpha,
@@ -48,6 +49,7 @@ async def on_message(message: aiormq.abc.DeliveredMessage):
         if result:
             total_count = result[0]['total_count']
             if total_count >= 5:
+                ONGOING_RULES_COUNTER.inc()
                 print(f"Сработало ongoing rule для ID: {batch.device_id}!")
                 await ongoing.insert_one({
                     "device_id": batch.device_id,

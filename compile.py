@@ -3,7 +3,7 @@ import subprocess
 import glob
 
 def compile_protobuf():
-    proto_dir = os.path.join(os.getcwd(), 'src', 'proto')
+    proto_dir = os.path.join(os.getcwd())
     proto_files = glob.glob(os.path.join(proto_dir, '*.proto'))
 
     if not proto_files:
@@ -26,3 +26,5 @@ def compile_protobuf():
         print("Protobuf message modules successfully generated!")
     except subprocess.CalledProcessError as e:
         print(f"Protobuf generation command failed with error code {e.returncode}")
+
+compile_protobuf()

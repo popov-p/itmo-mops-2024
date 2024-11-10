@@ -19,6 +19,9 @@ docker run -it --entrypoint /bin/sh pcont
 docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q) && docker volume rm $(docker volume ls -q)
 
 
+docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q) - снести всё кроме volumes !
+
+
     develop:
       watch:
         - action: sync+restart

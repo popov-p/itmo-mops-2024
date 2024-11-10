@@ -1,4 +1,3 @@
-from .rabbitmq import create_connection
 from fastapi import FastAPI
 from .routes import router
 
