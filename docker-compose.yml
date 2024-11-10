@@ -43,7 +43,7 @@ services:
   rule_engine:
     build:
       context: ./rule_engine
-    restart: on-failure
+    restart: always
     volumes:
       - rule_engine_src:/rule_engine/src
     develop:
