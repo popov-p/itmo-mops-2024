@@ -15,8 +15,8 @@ packages = [{include = "rule_engine", from = "src"},
 [tool.poetry.dependencies]
 python = "^3.12"
 protobuf = "^5.28.3"
-pika = "^1.3.2"
-pymongo = "4.10.1"
+aio_pika = "^1.3.2"
+motor = "^3.6.0"
 
 [tool.poetry.scripts]
 rule_engine = 'rule_engine.main:main'

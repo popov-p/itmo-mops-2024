@@ -9,7 +9,7 @@ import time
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
 
-url = "http://itmo-mops-2024-controller-1:5000/incoming-data"
+url = "http://itmo-mops-2024-controller-1:8000/incoming-data"
 
 class DataSimulator:
     def __init__(self, num_devices: int, frequency: float):
@@ -52,8 +52,8 @@ class DataSimulator:
 
 
 def main():
-    num_devices = 15
-    frequency = 0.5
+    num_devices = 1
+    frequency = 2
     generator = DataSimulator(num_devices, frequency)
 
     loop = asyncio.get_event_loop()

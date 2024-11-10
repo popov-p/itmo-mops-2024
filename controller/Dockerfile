@@ -21,6 +21,6 @@ COPY src/ ./src/
 RUN poetry lock --no-update && \
     poetry check && poetry install && \
     poetry cache clear --all --no-interaction .
-EXPOSE 5000
+EXPOSE 8000
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

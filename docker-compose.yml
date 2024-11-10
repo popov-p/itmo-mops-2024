@@ -1,7 +1,7 @@
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    restart: always
+    restart: on-failure
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -13,7 +13,7 @@ services:
 
   mongo:
     image: mongo
-    restart: always
+    restart: on-failure
     environment:
       MONGO_INITDB_ROOT_USERNAME: pavel
       MONGO_INITDB_ROOT_PASSWORD: popov
@@ -29,7 +29,7 @@ services:
       context: ./controller
     restart: on-failure
     ports:
-      - "5000:5000"
+      - "8000:8000"
     volumes:
       - controller_src:/controller/src
     develop:
@@ -74,3 +74,7 @@ volumes:
   controller_src:
   datasim_src:
   rule_engine_src:
+
+# networks:
+#   backend:
+#     driver: bridge
