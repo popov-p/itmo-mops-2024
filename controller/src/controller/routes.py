@@ -1,5 +1,5 @@
 from ..proto.messages_pb2 import Batch
-from .rabbitmq import device_channels, create_channel_for_device
+from .rabbitmq import device_channels, create_channel_for_device, rabbitmq_connection
 from fastapi import Request, Response, HTTPException, APIRouter
 from .database import db
 router = APIRouter()
@@ -15,7 +15,7 @@ async def incoming_data(request: Request):
 
         if batch.device_id not in device_channels:
             print("Канала нет, создаем новый.")
-            rabbitmq_channel = create_channel_for_device(batch.device_id)
+            rabbitmq_channel = create_channel_for_device(rabbitmq_connection, batch.device_id)
         else:
             print("Используем существующий канал.")
             rabbitmq_channel = device_channels[batch.device_id]

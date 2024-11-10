@@ -7,7 +7,7 @@ async def connect_to_rabbitmq():
     while True:
         try:
             connection = await aiormq.connect("amqp://pavel:popov@rabbitmq/")
-            channel = await connection.channel()
+            channel = await connection.channel(publisher_confirms=False)
             await channel.basic_consume('validated_queue', on_message)
             print("Подключён к брокеру.")
             return connection, channel
@@ -40,14 +40,14 @@ async def on_message(message: aiormq.abc.DeliveredMessage):
         await current_id_stack.insert_one(message_data)
 
         pipeline = [
-            {"$match": {"device_id": batch.device_id}},
+            {"$match": {"device_id": batch.device_id, "beta": {"$gte": 75}}},
             {"$count": "total_count"}
         ]
         result = await current_id_stack.aggregate(pipeline).to_list(length=None)
 
         if result:
             total_count = result[0]['total_count']
-            if total_count == 5:
+            if total_count >= 5:
                 print(f"Сработало ongoing rule для ID: {batch.device_id}!")
                 await ongoing.insert_one({
                     "device_id": batch.device_id,
