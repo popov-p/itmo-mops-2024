@@ -15,7 +15,7 @@ packages = [{include = "rule_engine", from = "src"},
 [tool.poetry.dependencies]
 python = "^3.12"
 protobuf = "^5.28.3"
-aio_pika = "^1.3.2"
+aio-pika = "^9.4.3"
 motor = "^3.6.0"
 
 [tool.poetry.scripts]

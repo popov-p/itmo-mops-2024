@@ -53,7 +53,7 @@ class DataSimulator:
 
 def main():
     num_devices = 1
-    frequency = 2
+    frequency = 1
     generator = DataSimulator(num_devices, frequency)
 
     loop = asyncio.get_event_loop()
