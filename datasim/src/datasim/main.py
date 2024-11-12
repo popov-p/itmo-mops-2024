@@ -1,3 +1,4 @@
+import os
 from proto.messages_pb2 import Batch
 from .prometheus import REQUESTS_TOTAL, REQUESTS_FAILED, REQUEST_DURATION, DEVICE_FREQ, DEVICE_COUNT
 from prometheus_client import start_http_server
@@ -8,7 +9,12 @@ import signal
 import logging
 import time
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
+logging.basicConfig(
+    filename='/var/log/application.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filemode='a'
+)
 
 url = "http://controller:8000/incoming-data"
 
@@ -27,6 +33,7 @@ class DataSimulator:
                                   alpha=random.randint(1, 100),
                                   beta=random.randint(1, 100),
                                   timestamp=str(time.time()))
+                    print("Отправка")
                     logging.info(f"Отправляем данные. ID: {batch.device_id}, "
                                  f"alpha: {batch.alpha}, beta: {batch.beta}, timestamp: {batch.timestamp}")
                     start_time = time.time()
@@ -63,7 +70,7 @@ class DataSimulator:
 
 def main():
     num_devices = 1
-    frequency = 2
+    frequency = 1
     generator = DataSimulator(num_devices, frequency)
 
     start_http_server(8070)
