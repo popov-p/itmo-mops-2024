@@ -1,4 +1,4 @@
-import pika, time
+import pika, time, logging
 
 device_channels = {}
 def create_connection():
@@ -7,10 +7,10 @@ def create_connection():
             credentials = pika.PlainCredentials('pavel', 'popov')
             parameters = pika.ConnectionParameters('rabbitmq', 5672, '/', credentials)
             new_connection = pika.BlockingConnection(parameters)
-            print("Подключён к брокеру.")
+            logging.info("Подключён к брокеру.")
             return new_connection
         except pika.exceptions.AMQPConnectionError as e:
-            print(f"Ошибка при подключении: {e}. Попробуем снова через 1 секунду.")
+            logging.error(f"Ошибка при подключении: {e}. Попробуем снова через 1 секунду.")
             time.sleep(2)
 
 rabbitmq_connection = create_connection() #rabbitmq

@@ -36,6 +36,7 @@ services:
       - "8000:8000"
     volumes:
       - controller_src:/controller/src
+      - logs_storage:/var/log/
     develop:
       watch:
         - action: sync+restart
@@ -52,6 +53,7 @@ services:
     restart: always
     volumes:
       - rule_engine_src:/rule_engine/src
+      - logs_storage:/var/log/
     ports:
       - "8080:8080"
     develop:

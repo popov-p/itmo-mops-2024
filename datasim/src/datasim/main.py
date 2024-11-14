@@ -10,9 +10,9 @@ import logging
 import time
 
 logging.basicConfig(
-    filename='/var/log/application.log',
+    filename='/var/log/datasim.log',
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(name)s - %(levelname)s - %(message)s',
     filemode='a'
 )
 
@@ -33,7 +33,6 @@ class DataSimulator:
                                   alpha=random.randint(1, 100),
                                   beta=random.randint(1, 100),
                                   timestamp=str(time.time()))
-                    print("Отправка")
                     logging.info(f"Отправляем данные. ID: {batch.device_id}, "
                                  f"alpha: {batch.alpha}, beta: {batch.beta}, timestamp: {batch.timestamp}")
                     start_time = time.time()
