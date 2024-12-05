@@ -1,0 +1,23 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "rule-engine"
+version = "0.1.0"
+description = "Rule Engine"
+authors = ["Pavel Popov <pashafizmat1@gmail.com>"]
+readme = "README.md"
+
+packages = [{include = "rule_engine", from = "src"},
+            {include = "proto", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+protobuf = "^5.28.3"
+aio-pika = "^9.4.3"
+motor = "^3.6.0"
+prometheus_client = "^0.21.0"
+
+[tool.poetry.scripts]
+rule_engine = 'rule_engine.main:main'

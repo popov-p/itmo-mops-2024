@@ -1,0 +1,24 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "datasim"
+version = "0.1.0"
+description = "Data Simulator."
+authors = ["Pavel Popov <pashafizmat1@gmail.com>"]
+readme = "README.md"
+packages = [{include = "datasim", from = "src"},
+            {include = "proto", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+protobuf = "^5.28.3"
+requests = "^2.32.3"
+aiohttp = "^3.10.10"
+prometheus_client = "^0.21.0"
+
+[tool.poetry.scripts]
+datasim = 'datasim.main:main'
+
+

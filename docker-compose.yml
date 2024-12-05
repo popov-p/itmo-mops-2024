@@ -1,0 +1,164 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: on-failure
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: pavel
+      RABBITMQ_DEFAULT_PASS: popov
+    networks:
+      - backend
+
+  mongo:
+    image: mongo
+    restart: on-failure
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: pavel
+      MONGO_INITDB_ROOT_PASSWORD: popov
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend
+
+  controller:
+    build:
+      context: ./controller
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    volumes:
+      - controller_src:/controller/src
+      - logs_storage:/var/log/
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: .
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  rule_engine:
+    build:
+      context: ./rule_engine
+    restart: always
+    volumes:
+      - rule_engine_src:/rule_engine/src
+      - logs_storage:/var/log/
+    ports:
+      - "8080:8080"
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: .
+    depends_on:
+      - controller
+    networks:
+      - backend
+
+  datasim:
+    build:
+      context: ./datasim
+    restart: always
+    volumes:
+      - datasim_src:/datasim/src
+      - logs_storage:/var/log/
+    ports:
+      - "8070:8070"
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: .
+    depends_on:
+      - rule_engine
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_storage:/var/lib/grafana
+    networks:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+
+  elasticsearch:
+    image: elasticsearch:8.15.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - backend
+
+  logstash:
+    image: logstash:8.15.3
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    networks:
+      - backend
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:8.15.3
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - backend
+    depends_on:
+      - elasticsearch
+  filebeat:
+    image: elastic/filebeat:8.15.3
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - logs_storage:/var/log
+    networks:
+      - backend
+    depends_on:
+      - logstash
+
+volumes:
+  mongo_data:
+  rabbitmq_data:
+  controller_src:
+  datasim_src:
+  rule_engine_src:
+  grafana_storage:
+  prometheus_data:
+  logs_storage:
+
+networks:
+  backend:
+    driver: bridge

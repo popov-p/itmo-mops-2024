@@ -1,0 +1,20 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "IOT controller"
+version = "0.1.0"
+description = "Incoming message manager."
+authors = ["Pavel Popov <pashafizmat1@gmail.com>"]
+readme = "README.md"
+packages = [{include = "controller", from = "src"},
+            {include = "proto", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+protobuf = "^5.28.3"
+pika = "^1.3.2"
+fastapi = {extras = ["standard"], version = "^0.115.4"}
+motor = "^3.6.0"
+prometheus_client = "^0.21.0"
