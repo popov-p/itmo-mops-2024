@@ -1,9 +1,13 @@
+import logging
+
 from ..proto.messages_pb2 import Batch
 from .rabbitmq import device_channels, create_channel_for_device, rabbitmq_connection
 from fastapi import Request, Response, HTTPException, APIRouter
 from .database import db
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from .prometheus import REQUESTS, BATCHES_ACCEPTED, BATCHES_DECLINED
+from  .report import metrics_reporter
+
 router = APIRouter()
 
 @router.get("/metrics")
@@ -18,17 +22,23 @@ async def incoming_data(request: Request):
         body = await request.body()
         batch = Batch()
         batch.ParseFromString(body)
+
+        metrics_reporter.add_fields_data(batch.alpha, batch.beta)
+
         if batch.alpha < 25:
             BATCHES_DECLINED.inc()
+            metrics_reporter.increment_declined_requests()
             raise HTTPException(501,"Не принято! Ожидается alpha >= 25")
 
         if batch.device_id not in device_channels:
+            metrics_reporter.increment_accepted_requests()
             BATCHES_ACCEPTED.inc()
-            print("Канала нет, создаем новый.")
+            logging.info("Канала нет, создаем новый.")
             rabbitmq_channel = create_channel_for_device(rabbitmq_connection, batch.device_id)
         else:
+            metrics_reporter.increment_accepted_requests()
             BATCHES_ACCEPTED.inc()
-            print("Используем существующий канал.")
+            logging.info("Используем существующий канал.")
             rabbitmq_channel = device_channels[batch.device_id]
         rabbitmq_channel.basic_publish(
             exchange='',
@@ -50,3 +60,5 @@ async def incoming_data(request: Request):
         raise e
     except Exception as e:
         raise HTTPException(500,f"Ошибка: {str(e)}")
+
+

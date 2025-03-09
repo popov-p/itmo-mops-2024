@@ -55,7 +55,7 @@ services:
       - rule_engine_src:/rule_engine/src
       - logs_storage:/var/log/
     ports:
-      - "8080:8080"
+      - "8700:8700"
     develop:
       watch:
         - action: sync+restart
@@ -139,6 +139,7 @@ services:
       - backend
     depends_on:
       - elasticsearch
+
   filebeat:
     image: elastic/filebeat:8.15.3
     volumes:
@@ -148,6 +149,14 @@ services:
       - backend
     depends_on:
       - logstash
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+    restart: on-failure
 
 volumes:
   mongo_data:
