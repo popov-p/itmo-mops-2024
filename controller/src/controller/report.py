@@ -2,6 +2,10 @@ import redis
 import asyncio
 from statistics import mean
 import logging
+import json
+import os
+
+controller_port = os.getenv("CONTROLLER_PORT_FIRST") or os.getenv("CONTROLLER_PORT_SECOND") or "UNDEFINED"
 
 logger = logging.getLogger()
 
@@ -36,14 +40,16 @@ class RedisMetricsReporter:
             else:
                 avg_alpha = avg_beta = 0
 
-            self.r.set("accepted_segment_requests", self.accepted_requests_by_segment)
-            self.r.set("declined_segment_requests", self.declined_requests_by_segment)
-            self.r.set("avg_segment_alpha", avg_alpha)
-            self.r.set("avg_segment_beta", avg_beta)
+            report_data = {
+                "accepted_segment_requests": self.accepted_requests_by_segment,
+                "declined_segment_requests": self.declined_requests_by_segment,
+                "avg_segment_alpha": avg_alpha,
+                "avg_segment_beta": avg_beta
+            }
 
-            print(f"Отчет в Redis обновлен. Принятых запросов: {self.accepted_requests_by_segment}, "
-                  f"Отклоненных: {self.declined_requests_by_segment}, "
-                  f"Среднее alpha: {avg_alpha}, Среднее beta: {avg_beta}")
+            self.r.set(f"report-{controller_port}", json.dumps(report_data))
+
+            print(f"Отчет в Redis обновлен: {report_data}")
 
             self.reset_metrics()
 

@@ -6,7 +6,10 @@ from fastapi import Request, Response, HTTPException, APIRouter
 from .database import db
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from .prometheus import REQUESTS, BATCHES_ACCEPTED, BATCHES_DECLINED
-from  .report import metrics_reporter
+from  .report import metrics_reporter, r, controller_port
+import json
+
+
 
 router = APIRouter()
 
@@ -61,4 +64,15 @@ async def incoming_data(request: Request):
     except Exception as e:
         raise HTTPException(500,f"Ошибка: {str(e)}")
 
+
+@router.get("/report", response_model=dict)
+async def cached_report():
+    report_key = f"report-{controller_port}"
+
+    report_data = r.get(report_key)
+
+    if report_data:
+        return json.loads(report_data.decode())
+    else:
+        raise HTTPException(status_code=404, detail=f"Report for controller at port {controller_port} not found")
 

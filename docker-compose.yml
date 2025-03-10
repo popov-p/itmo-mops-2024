@@ -28,12 +28,35 @@ services:
     networks:
       - backend
 
-  controller:
+  controller_first:
     build:
       context: ./controller
     restart: on-failure
     ports:
-      - "8000:8000"
+      - "${CONTROLLER_PORT_FIRST:-8061}:8061"
+    environment:
+      - CONTROLLER_PORT_FIRST=8061
+    volumes:
+      - controller_src:/controller/src
+      - logs_storage:/var/log/
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: .
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  controller_second:
+    build:
+      context: ./controller
+    restart: on-failure
+    ports:
+      - "${CONTROLLER_PORT_SECOND:-8062}:8062"
+    environment:
+      - CONTROLLER_PORT_SECOND=8062
     volumes:
       - controller_src:/controller/src
       - logs_storage:/var/log/
@@ -62,7 +85,8 @@ services:
           path: .
           target: .
     depends_on:
-      - controller
+      - controller_first
+      - controller_second
     networks:
       - backend
 
@@ -114,6 +138,7 @@ services:
       - xpack.security.enabled=false
     ports:
       - "9200:9200"
+    restart: on-failure
     networks:
       - backend
 
@@ -126,6 +151,7 @@ services:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     networks:
       - backend
+    restart: on-failure
     depends_on:
       - elasticsearch
 
@@ -137,6 +163,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     networks:
       - backend
+    restart: on-failure
     depends_on:
       - elasticsearch
 
@@ -147,6 +174,7 @@ services:
       - logs_storage:/var/log
     networks:
       - backend
+    restart: on-failure
     depends_on:
       - logstash
 
@@ -157,6 +185,19 @@ services:
     networks:
       - backend
     restart: on-failure
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./index.html:/usr/share/nginx/html/index.html
+    restart: on-failure
+    networks:
+      - backend
+
 
 volumes:
   mongo_data:

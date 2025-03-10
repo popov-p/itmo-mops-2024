@@ -16,7 +16,7 @@ logging.basicConfig(
     filemode='a'
 )
 
-url = "http://controller:8000/incoming-data"
+url = "http://nginx/incoming-data"
 
 class DataSimulator:
     def __init__(self, num_devices: int, frequency: float):
@@ -35,25 +35,34 @@ class DataSimulator:
                                   timestamp=str(time.time()))
                     logging.info(f"Отправляем данные. ID: {batch.device_id}, "
                                  f"alpha: {batch.alpha}, beta: {batch.beta}, timestamp: {batch.timestamp}")
+                    print(f"Отправляем данные. ID: {batch.device_id}, "
+                                 f"alpha: {batch.alpha}, beta: {batch.beta}, timestamp: {batch.timestamp}")
                     start_time = time.time()
+
                     try:
                         async with session.post(url, data=batch.SerializeToString()) as response:
                             duration = time.time() - start_time
                             REQUEST_DURATION.labels(device_id=device_id).set(duration)
                             if response.status == 200:
                                 logging.info(f"Ответ от IOT контроллера: {await response.text()}")
+                                print(f"Ответ от IOT контроллера: {await response.text()}")
                                 REQUESTS_TOTAL.labels(status="success").inc()
                             else:
                                 error_text = await response.text()
                                 logging.error(f"Ошибка при отправке. Статус: {response.status}, тело ошибки: {error_text}.")
+                                print(
+                                    f"Ошибка при отправке. Статус: {response.status}, тело ошибки: {error_text}.")
                     except Exception as ex:
                         logging.error(f"Ошибка при отправке данных. {ex}")
+                        print(f"Ошибка при отправке данных. {ex}")
                         REQUESTS_FAILED.labels(device_id=device_id).inc()
-                    await asyncio.sleep(1 / self.frequency) 
+                    await asyncio.sleep(1 / self.frequency)
         except Exception as ex:
             logging.error(f"An error occurred in task for device {device_id}: {ex}")
+            print(f"An error occurred in task for device {device_id}: {ex}")
         finally:
             logging.info(f"Task stopped for device {device_id}.")
+            print(f"Task stopped for device {device_id}.")
 
     def stop(self):
         self.stop_event.set()

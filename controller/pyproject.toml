@@ -19,3 +19,4 @@ fastapi = {extras = ["standard"], version = "^0.115.4"}
 motor = "^3.6.0"
 prometheus_client = "^0.21.0"
 redis = "^5.2.1"
+pydantic = "^2.10.6"
